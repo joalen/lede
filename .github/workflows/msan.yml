@@ -33,7 +33,6 @@ jobs:
       - name: Install dependencies for project (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew unlink awk
           brew install coreutils diffutils findutils gawk gnu-getopt gnu-tar grep make ncurses pkg-config wget quilt xz
           brew install gcc@11
           echo 'export PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"' >> ~/.bashrc
