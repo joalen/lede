@@ -72,6 +72,7 @@ jobs:
           #!/bin/bash
           set +e 
 
+          mkdir -p memorysan_logs
           files=$(find . -type f)
           failed_compilations=0
           successful_compilations=0
