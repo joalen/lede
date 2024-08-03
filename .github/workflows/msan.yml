@@ -65,7 +65,15 @@ jobs:
         run: |
           brew update
           brew install llvm ninja coreutils
+
+      - name: Disable Address Space Randomization
+        if: runner.os == 'Linux'
+        run: sudo sysctl -w kernel.randomize_va_space=0
       
+      - name: Disable swapping 
+        if: runner.os == 'Linux' 
+        run: sudo swapoff -a
+        
       - name: Run Google Memory Sanitizer (source code) (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -106,14 +114,6 @@ jobs:
 
           echo "Memory Sanitizer Failures: $failed_compilations"
           echo "Memory Sanitizer Successes: $successful_compilations"
-
-      - name: Disable Address Space Randomization
-        if: runner.os == 'Linux'
-        run: sudo sysctl -w kernel.randomize_va_space=0
-      
-      - name: Disable swapping 
-        if: runner.os == 'Linux' 
-        run: sudo swapoff -a
         
       - name: Run Google Memory Sanitizer (source code) (macOS)
         if: runner.os == 'macOS'
