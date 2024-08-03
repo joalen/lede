@@ -106,6 +106,14 @@ jobs:
           echo "Memory Sanitizer Failures: $failed_compilations"
           echo "Memory Sanitizer Successes: $successful_compilations"
 
+      - name: Disable Address Space Randomization
+        if: runner.os == 'Linux'
+        run: sudo sysctl -w kernel.randomize_va_space=0
+      
+      - name: Disable swapping 
+        if: runner.os == 'Linux' 
+        run: sudo swapoff -a
+        
       - name: Run Google Memory Sanitizer (source code) (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -128,7 +136,7 @@ jobs:
                       continue  # Skip to the next file on compilation error
                   fi
 
-                  gtimeout $TIMEOUT_DURATION ./compiled.out
+                  gtimeout $TIMEOUT_DURATION ./compiled.out > ./memorysan_logs/$(basename "$executable")_msan_report.txt 2>&1
                   exit_status=$?
 
                   if [ $exit_status -eq 1 ]; then
@@ -145,3 +153,9 @@ jobs:
 
           echo "Memory Sanitizer Failures: $failed_compilations"
           echo "Memory Sanitizer Successes: $successful_compilations"
+
+      - name: Upload Msan reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: msan-report-${{ github.event.repository.name}}-on-${{ matrix.os }}-from_branch_${{ github.ref_name }}
+          path: './memorysan_logs/*'
